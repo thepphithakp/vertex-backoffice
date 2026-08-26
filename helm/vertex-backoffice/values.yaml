@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/thepphithakp/vertex-backoffice
+  pullPolicy: Always
+  # ส่งตอน deploy เป็น sha ของ commit ไม่ใช่ latest
+  # เพื่อให้รู้ได้เสมอว่า pod ที่รันอยู่มาจาก code ก้อนไหน
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  # ⚠️ ห้ามใส่ค่าจริงลงไฟล์นี้ — repo เป็น public
+  #    ส่งตอน deploy ด้วย --set ingress.host=...
+  host: ""
+  # ต้องตรงกับ base ใน vite.config.ts และ location ใน nginx.conf
+  path: /backoffice
+  pathType: Prefix
+  annotations:
+    # ingress ของ cluster นี้ยังไม่มี TLS จริง ปล่อยให้ redirect
+    # จะกลายเป็น loop ที่เข้าหน้าไม่ได้เลย
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    # หน้านี้ไม่มี upload อะไร ค่า default ของ nginx พอแล้ว
+    nginx.ingress.kubernetes.io/proxy-body-size: "1m"
+
+# static file ล้วน แทบไม่ใช้ CPU — ตั้งไว้ต่ำสุดเท่าที่ nginx อยู่ได้
+# node นี้แชร์กับ ELK และ database ที่กิน memory เยอะกว่ามาก
+resources:
+  requests:
+    cpu: 10m
+    memory: 16Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+podAnnotations: {}
