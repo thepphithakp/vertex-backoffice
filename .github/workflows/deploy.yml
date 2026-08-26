@@ -71,6 +71,10 @@ jobs:
         with:
           context: .
           push: true
+          # ตั้งเป็น repository variable (ไม่ใช่ secret) — client id ไม่ใช่ความลับ
+          # ไม่ตั้ง = build ผ่าน แต่ปุ่ม Google จะหายไปจากหน้า login
+          build-args: |
+            VITE_GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

@@ -37,7 +37,11 @@ function MainLayout() {
   );
 }
 
-const GOOGLE_CLIENT_ID = "565361629384-lre3e35dhoj151akegf1bskv38st9oe3.apps.googleusercontent.com";
+// client id ของ Google ไม่ใช่ความลับโดยการออกแบบ แต่เก็บไว้นอก code
+// เพื่อให้เปลี่ยนโปรเจกต์ Google ได้โดยไม่ต้องแก้ source (VT-82)
+// ตั้งผ่าน VITE_GOOGLE_CLIENT_ID ตอน build — ถ้าไม่ตั้ง ปุ่ม Google จะไม่ขึ้น
+// แต่ login ด้วย email/password ยังใช้ได้ตามปกติ
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '';
 
 export function App() {
   return (

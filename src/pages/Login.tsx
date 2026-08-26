@@ -8,7 +8,11 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loginMode, setLoginMode] = useState<'password' | 'google'>('google');
+  // ไม่ได้ตั้ง client id = ปุ่ม Google ใช้ไม่ได้ ให้เริ่มที่ email/password แทน
+  const googleEnabled = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+  const [loginMode, setLoginMode] = useState<'password' | 'google'>(
+    googleEnabled ? 'google' : 'password'
+  );
   const { login } = useAuth();
 
   const handlePasswordLogin = async (e: Event) => {
@@ -77,6 +81,8 @@ export function Login() {
           </div>
         )}
 
+        {/* ไม่มี client id ก็ไม่ต้องมีตัวเลือกให้กด — กดไปก็ขึ้น error อย่างเดียว */}
+        {googleEnabled && (
         <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', backgroundColor: 'rgba(0,0,0,0.05)', padding: '4px', borderRadius: '8px' }}>
           <button 
             type="button"
@@ -93,6 +99,7 @@ export function Login() {
                      boxShadow: loginMode === 'password' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}
           >Email/Password</button>
         </div>
+        )}
 
         {loginMode === 'password' ? (
           <form onSubmit={handlePasswordLogin}>

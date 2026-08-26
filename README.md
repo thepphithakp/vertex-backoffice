@@ -45,12 +45,13 @@ npm run dev                  # เปิด http://localhost:5173/backoffice/
 GitHub Actions ทำให้อัตโนมัติเมื่อ push ขึ้น `main` — build → push image ขึ้น GHCR →
 `helm upgrade` → รอ pod ready จริงก่อนถือว่าสำเร็จ
 
-secret ที่ต้องตั้งใน repo:
+ค่าที่ต้องตั้งใน repo:
 
-| Secret | ใช้ทำอะไร |
-|---|---|
-| `KUBECONFIG_CONTENT` | เข้าถึงคลัสเตอร์ (namespace `vertex`) |
-| `INGRESS_HOST` | host ของ ingress — เป็นค่าจริงจึงไม่เก็บใน repo |
+| ชื่อ | ชนิด | ใช้ทำอะไร |
+|---|---|---|
+| `KUBECONFIG_CONTENT` | secret | เข้าถึงคลัสเตอร์ (namespace `vertex`) |
+| `INGRESS_HOST` | secret | host ของ ingress — เป็นค่าจริงจึงไม่เก็บใน repo |
+| `GOOGLE_CLIENT_ID` | variable | client id ของ Google OAuth · ไม่ตั้งก็ deploy ผ่าน แต่ปุ่ม Google จะหายไป |
 
 chart จะ **ปฏิเสธที่จะ render** ถ้าไม่ส่ง `ingress.host` ดีกว่าปล่อยให้ deploy
 ค่าว่างขึ้นไปแล้วมาพังทีหลัง
@@ -80,9 +81,12 @@ helm upgrade --install vertex-backoffice ./helm/vertex-backoffice \
 
 ## Google Sign-In
 
-Client ID อยู่ใน `src/app.tsx` (client ID ไม่ใช่ความลับโดยการออกแบบ)
-แต่ origin ที่ใช้งานจริงต้องถูกเพิ่มใน Google Cloud Console ก่อน
-ไม่งั้นปุ่ม Google จะขึ้น error ส่วนการ login ด้วย email/password ยังใช้ได้ตามปกติ
+client id มาจาก `VITE_GOOGLE_CLIENT_ID` ตอน build (ฝังลง bundle เลยเพราะเป็น
+static SPA) ไม่ได้ hardcode ไว้ใน source แล้ว — **ไม่ตั้งค่านี้ ปุ่ม Google จะไม่ขึ้น**
+และหน้า login เหลือแค่ email/password ซึ่งยังใช้ได้ปกติ
+
+origin ที่ใช้งานจริงต้องถูกเพิ่มใน Google Cloud Console (Authorized JavaScript
+origins) ของ client id นั้นด้วย ไม่งั้นปุ่มจะขึ้น error ทั้งที่ตั้ง client id ถูก
 
 ## โครงสร้าง
 

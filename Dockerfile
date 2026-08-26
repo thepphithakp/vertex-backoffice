@@ -10,6 +10,11 @@ RUN npm ci
 
 COPY . .
 
+# client id ของ Google ถูกฝังลง bundle ตอน build (vite แทนค่า import.meta.env)
+# ไม่ตั้งก็ build ผ่าน แต่ปุ่ม Google จะไม่ขึ้น เหลือ login ด้วย email/password
+ARG VITE_GOOGLE_CLIENT_ID=""
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+
 # build ผ่าน tsc ก่อนเสมอ (ดู script build ใน package.json)
 # type error จึงทำให้ image build ล้ม ไม่ใช่ไปโผล่ตอน runtime
 RUN npm run build
