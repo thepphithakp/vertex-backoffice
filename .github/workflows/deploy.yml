@@ -112,10 +112,15 @@ jobs:
             exit 1
           fi
 
+          # runId ทำให้ pod template เปลี่ยนทุกครั้งที่ workflow รัน
+          # ไม่งั้นการ build commit เดิมซ้ำ (เช่น workflow_dispatch หลังแก้ variable)
+          # จะได้ image ใหม่ใน tag เดิม แล้ว helm มองว่าไม่มีอะไรเปลี่ยน
+          # ผลคือ deploy ขึ้นเขียวแต่ pod เก่ายังเสิร์ฟของเดิมอยู่ — เกิดจริงมาแล้ว
           helm upgrade --install vertex-backoffice ./helm/vertex-backoffice \
             --namespace vertex \
             --set image.tag=sha-${{ github.sha }} \
             --set ingress.host="${{ secrets.INGRESS_HOST }}" \
+            --set podAnnotations.runId="${{ github.run_id }}" \
             --wait --timeout 3m
 
       - name: ตรวจว่า pod ตอบจริงหลัง deploy
