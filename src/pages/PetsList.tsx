@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import { PawPrint, Edit, Trash2, Users } from 'lucide-preact';
 import { useAuth } from '../context/AuthContext';
+import { toList } from '../lib/list';
 
 export function PetsList() {
   const [pets, setPets] = useState<any[]>([]);
@@ -20,7 +21,7 @@ export function PetsList() {
         if (res.ok) {
           const usersList = await res.json();
           const map: Record<string, string> = {};
-          usersList.forEach((u: any) => {
+          toList<any>(usersList).forEach((u: any) => {
             map[u.id] = u.fullName || u.email;
           });
           setUsersMap(map);
@@ -48,7 +49,7 @@ export function PetsList() {
         }
         
         const data = await res.json();
-        setPets(data || []);
+        setPets(toList(data));
       } catch (err: any) {
         setError(err.message);
       } finally {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import { Users, PawPrint, Activity } from 'lucide-preact';
 import { useAuth } from '../context/AuthContext';
+import { toList } from '../lib/list';
 
 export function Dashboard() {
   const [stats, setStats] = useState({ pets: 0, users: 0, eventsToday: 0 });
@@ -23,23 +24,23 @@ export function Dashboard() {
           return;
         }
         
-        const eventsData = resEvents.ok ? await resEvents.json() : [];
-        const petsData = resPets.ok ? await resPets.json() : [];
-        const usersData = resUsers.ok ? await resUsers.json() : [];
+        const eventsData = toList<any>(resEvents.ok ? await resEvents.json() : []);
+        const petsData = toList<any>(resPets.ok ? await resPets.json() : []);
+        const usersData = toList<any>(resUsers.ok ? await resUsers.json() : []);
 
         const pMap: Record<string, string> = {};
-        (petsData || []).forEach((p: any) => { pMap[p.id] = p.name; });
+        petsData.forEach((p: any) => { pMap[p.id] = p.name; });
         setPetsMap(pMap);
 
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
-        const events = eventsData || [];
+        const events = eventsData;
         const todayEvents = events.filter((e: any) => new Date(e.timestamp) >= todayStart);
 
         setStats({
-          pets: (petsData || []).length,
-          users: (usersData || []).length,
+          pets: petsData.length,
+          users: usersData.length,
           eventsToday: todayEvents.length
         });
         

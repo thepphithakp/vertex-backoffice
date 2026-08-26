@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import { Filter } from 'lucide-preact';
 import { useAuth } from '../context/AuthContext';
+import { toList } from '../lib/list';
 
 export function EventLog() {
   const [logs, setLogs] = useState<any[]>([]);
@@ -25,12 +26,12 @@ export function EventLog() {
         if (!resEvents.ok) throw new Error('Failed to fetch events');
         
         const eventsData = await resEvents.json();
-        setLogs(eventsData || []);
+        setLogs(toList(eventsData));
 
         if (resPets.ok) {
           const petsData = await resPets.json();
           const pMap: Record<string, string> = {};
-          (petsData || []).forEach((p: any) => {
+          toList<any>(petsData).forEach((p: any) => {
             pMap[p.id] = p.name;
           });
           setPetsMap(pMap);

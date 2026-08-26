@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import { Users, Edit, Trash2 } from 'lucide-preact';
 import { useAuth } from '../context/AuthContext';
+import { toList } from '../lib/list';
 
 export function UsersList() {
   const [users, setUsers] = useState<any[]>([]);
@@ -27,7 +28,7 @@ export function UsersList() {
         }
         
         const data = await res.json();
-        setUsers(data || []);
+        setUsers(toList(data));
       } catch (err: any) {
         setError(err.message);
       } finally {
